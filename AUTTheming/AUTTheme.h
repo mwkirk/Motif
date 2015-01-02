@@ -25,7 +25,12 @@
 /**
  If the JSON at the specified URL does not exist or is unable to be parsed, an error is returned in the pass-by-reference error parameter.
  */
-- (void)addAttributesFromThemeAtURL:(NSURL *)URL error:(NSError **)error;
++ (instancetype)themeFromURL:(NSURL *)URL error:(NSError **)error;
+
+/**
+ Combines themes passed as an argument into a new theme. 
+ */
++ (instancetype)themeWithThemes:(NSArray *)themes;
 
 /**
  The constant value from the theme collection for the specified key.

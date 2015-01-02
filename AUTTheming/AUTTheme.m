@@ -25,6 +25,31 @@ NSString * const AUTThemeClassesKey = @"classes";
 
 #pragma mark - Public
 
++ (instancetype)themeFromURL:(NSURL *)URL error:(NSError **)error;
+{
+    AUTTheme *theme = [self new];
+    
+    [theme addAttributesFromThemeAtURL:URL error:error];
+    
+    if (*error) {
+        theme = nil;
+    }
+    
+    return theme;
+}
+
++ (instancetype)themeWithThemes:(NSArray *)themes
+{
+    AUTTheme *compositeTheme = [AUTTheme new];
+    
+    for (AUTTheme *theme in themes) {
+        if ([theme isKindOfClass:[AUTTheme class]]) {
+            [compositeTheme addConstantsAndClassesFromRawAttributesDictionary:theme.rawAttribuesDictionary forThemeWithName:theme.names.firstObject error:nil];;
+        }
+    }
+    return compositeTheme;
+}
+
 - (void)addAttributesFromThemeAtURL:(NSURL *)themeURL error:(NSError **)error
 {
     NSAssert(themeURL, @"You must provide a `themeURL` when adding attributes to a theme.");
@@ -76,6 +101,8 @@ NSString * const AUTThemeClassesKey = @"classes";
 {
     NSParameterAssert(name);
     NSParameterAssert(dictionary);
+    
+    [self.rawAttribuesDictionary addEntriesFromDictionary:dictionary];
     
     [self addNamesObject:name];
     
@@ -315,6 +342,14 @@ NSString * const AUTThemeClassesKey = @"classes";
         return intersectingKeys;
     }
     return nil;
+}
+
+- (NSMutableDictionary *)rawAttribuesDictionary
+{
+    if (_rawAttribuesDictionary == nil) {
+        _rawAttribuesDictionary = [NSMutableDictionary new];
+    }
+    return _rawAttribuesDictionary;
 }
 
 @end

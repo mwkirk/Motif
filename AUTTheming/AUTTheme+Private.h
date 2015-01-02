@@ -17,5 +17,6 @@ extern NSString * const AUTThemeSuperclassKey;
 @property (nonatomic) NSArray *names;
 @property (nonatomic) NSDictionary *mappedConstants;
 @property (nonatomic) NSDictionary *mappedClasses;
+@property (nonatomic) NSMutableDictionary *rawAttribuesDictionary;
 
 @end
