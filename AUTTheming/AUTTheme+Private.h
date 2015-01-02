@@ -14,8 +14,8 @@ extern NSString * const AUTThemeSuperclassKey;
 
 - (void)addConstantsAndClassesFromRawAttributesDictionary:(NSDictionary *)dictionary forThemeWithName:(NSString *)name error:(NSError **)error;
 
-@property (nonatomic) NSArray *names;
 @property (nonatomic) NSDictionary *mappedConstants;
 @property (nonatomic) NSDictionary *mappedClasses;
+@property (nonatomic, readwrite) NSArray *themes;
 
 @end

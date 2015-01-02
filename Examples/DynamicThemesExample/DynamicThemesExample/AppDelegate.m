@@ -39,17 +39,12 @@
 {
     if (!_lightTheme) {
         self.lightTheme = ({
-            AUTTheme *theme = [AUTTheme new];
             NSError *error;
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Colors" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Typography" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"LightMappings" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Buttons" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Navigation" withExtension:@"json"] error:&error];
+            AUTTheme *theme = [AUTTheme themeWithThemes:@[[AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Colors" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Typography" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"LightMappings" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Buttons" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Navigation" withExtension:@"json"] error:&error]?:@0]];
             NSAssert(!error, @"Error when adding attributes to theme: %@", error);
             theme;
         });
@@ -61,17 +56,12 @@
 {
     if (!_darkTheme) {
         self.darkTheme = ({
-            AUTTheme *theme = [AUTTheme new];
             NSError *error;
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Colors" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Typography" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"DarkMappings" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Buttons" withExtension:@"json"] error:&error];
-            NSAssert(!error, @"Error when adding attributes to theme: %@", error);
-            [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Navigation" withExtension:@"json"] error:&error];
+            AUTTheme *theme = [AUTTheme themeWithThemes:@[[AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Colors" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Typography" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"DarkMappings" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Buttons" withExtension:@"json"] error:&error]?:@0,
+                                                          [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Navigation" withExtension:@"json"] error:&error]?:@0]];
             NSAssert(!error, @"Error when adding attributes to theme: %@", error);
             theme;
         });

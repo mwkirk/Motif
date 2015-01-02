@@ -25,6 +25,26 @@ NSString * const AUTThemeClassesKey = @"classes";
 
 #pragma mark - Public
 
++ (instancetype)themeFromURL:(NSURL *)URL error:(NSError **)error;
+{
+    AUTTheme *theme = [self new];
+    
+    [theme addAttributesFromThemeAtURL:URL error:error];
+    
+    if (*error) {
+        theme = nil;
+    }
+    
+    return theme;
+}
+
++ (instancetype)themeWithThemes:(NSArray *)themes
+{
+    AUTTheme *compositeTheme = [AUTTheme new];
+    compositeTheme.themes = themes;
+    return compositeTheme;
+}
+
 - (void)addAttributesFromThemeAtURL:(NSURL *)themeURL error:(NSError **)error
 {
     NSAssert(themeURL, @"You must provide a `themeURL` when adding attributes to a theme.");
@@ -47,27 +67,40 @@ NSString * const AUTThemeClassesKey = @"classes";
 
 - (id)constantValueForKey:(NSString *)key
 {
-    return [self constantForKey:key].mappedValue;
+    id __block value = [self constantForKey:key].mappedValue;
+    
+    if (value == nil) {
+        [self.themes enumerateObjectsUsingBlock:^(AUTTheme *theme, NSUInteger idx, BOOL *stop) {
+            value = [theme constantValueForKey:key];
+            if (value != nil) {
+                *stop = YES;
+            }
+        }];
+    }
+
+    
+    return value;
 }
 
 - (AUTThemeClass *)themeClassForName:(NSString *)name
 {
-    return self.mappedClasses[name];
+    AUTThemeClass __block *class = self.mappedClasses[name];
+    
+    if (class == nil) {
+        [self.themes enumerateObjectsUsingBlock:^(AUTTheme *theme, NSUInteger idx, BOOL *stop) {
+            class = [theme themeClassForName:name];
+            if (class != nil) {
+                *stop = YES;
+            }
+        }];
+    }
+    
+    return class;
 }
 
 - (NSDictionary *)propertiesForClassWithKey:(NSString *)key
 {
     return nil;
-}
-
-#pragma mark Theme Names
-
-- (NSArray *)names
-{
-    if (!_names) {
-        self.names = [NSArray new];
-    }
-    return _names;
 }
 
 #pragma mark - Private
@@ -77,7 +110,7 @@ NSString * const AUTThemeClassesKey = @"classes";
     NSParameterAssert(name);
     NSParameterAssert(dictionary);
     
-    [self addNamesObject:name];
+    _name = name;
     
     [self addConstantsFromRawAttributesDictionary:dictionary error:error];
     if (error && *error) {
@@ -241,15 +274,6 @@ NSString * const AUTThemeClassesKey = @"classes";
     }
     NSDictionary *JSONDictionary = [NSJSONSerialization JSONObjectWithData:JSONData options:0 error:error];
     return JSONDictionary;
-}
-
-#pragma mark Names
-
-- (void)addNamesObject:(NSString *)object
-{
-    NSMutableSet *themeNames = [self.names mutableCopy];
-    [themeNames addObject:object];
-    self.names = [themeNames copy];
 }
 
 #pragma mark Constants

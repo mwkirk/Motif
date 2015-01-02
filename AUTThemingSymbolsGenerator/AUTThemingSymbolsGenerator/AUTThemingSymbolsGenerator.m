@@ -36,9 +36,8 @@
             gbfprintln(stderr, @"[!] Error: '%@' is an invalid file path. Please supply another.", themePath);
             return 1;
         }
-        AUTTheme *theme = [AUTTheme new];
         NSError *error;
-        [theme addAttributesFromThemeAtURL:themeURL error:&error];
+        AUTTheme *theme = [AUTTheme themeFromURL:themeURL error:&error];
         if (error) {
             gbfprintln(stderr, @"[!] Error: Unable to parse theme at URL '%@': %@", themeURL, error);
             return 1;

@@ -14,10 +14,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    AUTTheme *theme = [AUTTheme new];
-    
     NSError *error;
-    [theme addAttributesFromThemeAtURL:[[NSBundle mainBundle] URLForResource:@"Theme" withExtension:@"json"] error:&error];
+    AUTTheme *theme = [AUTTheme themeFromURL:[[NSBundle mainBundle] URLForResource:@"Theme" withExtension:@"json"] error:&error];
     NSAssert(!error, @"Error when adding attributes to theme: %@", error);
     
     AUTThemeApplier *applier = [[AUTThemeApplier alloc] initWithTheme:theme];
