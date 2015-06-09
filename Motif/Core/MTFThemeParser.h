@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MTFThemeParser : NSObject
 
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)init UNAVAILABLE_ATTRIBUTE;
 
 /**
  Initializes a theme parser with a raw theme and parses it, populating the

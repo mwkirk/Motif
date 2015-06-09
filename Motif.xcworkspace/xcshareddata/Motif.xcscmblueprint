@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "403720F90A210EACA847A8896912ACAAF21931F6",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "7014442F67E0FF4DAC907512E3FC2C6942C9DF12" : 0,
+    "403720F90A210EACA847A8896912ACAAF21931F6" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "9D7570CA-0F0D-47C9-9C3E-A0D6133EF736",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "7014442F67E0FF4DAC907512E3FC2C6942C9DF12" : "iOS-App",
+    "403720F90A210EACA847A8896912ACAAF21931F6" : "Motif"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Motif",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 203,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Motif.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:erichoracek\/AUTTheming.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "403720F90A210EACA847A8896912ACAAF21931F6"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:Automatic\/iOS-App.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7014442F67E0FF4DAC907512E3FC2C6942C9DF12"
+    }
+  ]
+}
