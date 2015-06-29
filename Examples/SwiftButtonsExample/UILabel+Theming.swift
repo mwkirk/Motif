@@ -18,7 +18,7 @@ extension UILabel {
         self.mtf_registerThemeProperties([
             ThemeProperties.fontName.rawValue,
             ThemeProperties.fontSize.rawValue
-            ], valueTransformerNamesOrRequiredClasses: [
+            ], requiringValuesOfType: [
                 NSString.self,
                 NSNumber.self
             ], applierBlock: { (properties, label: AnyObject) -> Void in

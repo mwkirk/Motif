@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Cartography
+//import Cartography
 
 class ButtonsView: UIView {
     
@@ -35,18 +35,18 @@ class ButtonsView: UIView {
     }
     
     override func updateConstraints() {
-        constrain(saveButton) { view in
-            view.right == view.superview!.centerX - (self.buttonPadding)
-            view.centerY == view.superview!.centerY
-            view.width == self.buttonWidth
-        }
-        
-        constrain(deleteButton) { view in
-            view.left == view.superview!.centerX + (self.buttonPadding)
-            view.centerY == view.superview!.centerY
-            view.width == self.buttonWidth
-        }
-        
+//        constrain(saveButton) { view in
+//            view.right == view.superview!.centerX - (self.buttonPadding)
+//            view.centerY == view.superview!.centerY
+//            view.width == self.buttonWidth
+//        }
+//        
+//        constrain(deleteButton) { view in
+//            view.left == view.superview!.centerX + (self.buttonPadding)
+//            view.centerY == view.superview!.centerY
+//            view.width == self.buttonWidth
+//        }
+
         super.updateConstraints()
     }
     
@@ -58,8 +58,8 @@ class ButtonsView: UIView {
     
     // MARK: - ButtonsView
     
-    let saveButton = UIButton.buttonWithType(UIButtonType.System) as! UIButton
-    let deleteButton = UIButton.buttonWithType(UIButtonType.System) as! UIButton
+    let saveButton = UIButton(type:.System)
+    let deleteButton = UIButton(type:.System)
     
     let buttonWidth = 145.0;
     let buttonPadding = 5.0;

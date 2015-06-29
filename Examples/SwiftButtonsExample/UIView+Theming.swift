@@ -17,7 +17,7 @@ extension UIView {
         
         self.mtf_registerThemeProperty(
             ThemeProperties.backgroundColor.rawValue,
-            valueTransformerName: MTFColorFromStringTransformerName,
+            requiringValueOfClass: UIColor.self,
             applierBlock: { (color, view) -> Void in
                 if
                     let view = view as? UIView,
@@ -29,7 +29,7 @@ extension UIView {
         
         self.mtf_registerThemeProperty(
             ThemeProperties.borderColor.rawValue,
-            valueTransformerName: MTFColorFromStringTransformerName,
+            requiringValueOfClass: UIColor.self,
             applierBlock: { (color, view) -> Void in
                 if
                     let view = view as? UIView,
