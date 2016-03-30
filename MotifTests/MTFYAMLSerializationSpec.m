@@ -6,9 +6,9 @@
 //  Copyright (c) 2015 Eric Horacek. All rights reserved.
 //
 
-@import Motif;
-@import Specta;
-@import Expecta;
+#import <Motif/Motif.h>
+#import <Specta/Specta.h>
+#import <Expecta/Expecta.h>
 
 #import "MTFYAMLSerialization.h"
 

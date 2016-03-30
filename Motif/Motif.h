@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Eric Horacek. All rights reserved.
 //
 
-@import Foundation;
+#import <Foundation/Foundation.h>
 
 //! Project version number for Motif.
 FOUNDATION_EXPORT double MotifVersionNumber;

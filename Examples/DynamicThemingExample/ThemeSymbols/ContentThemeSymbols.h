@@ -1,6 +1,6 @@
 // WARNING: Do not modify. This file is machine-generated from 'ContentTheme.yaml' by Motif.
 
-@import Foundation;
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

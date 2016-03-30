@@ -6,9 +6,9 @@
 //  Copyright © 2016 Eric Horacek. All rights reserved.
 //
 
-@import Foundation;
-@import CoreGraphics;
-@import Motif;
+#import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
+#import <Motif/Motif.h>
 
 @interface MTFTestCTypePropertiesApplicant : NSObject
 

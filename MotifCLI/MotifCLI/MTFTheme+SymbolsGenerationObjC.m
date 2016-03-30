@@ -177,7 +177,7 @@ typedef NS_ENUM(NSInteger, FileType) {
     
     switch (fileType) {
     case FileTypeHeader:
-        return @"@import Foundation;";
+        return @"#import <Foundation/Foundation.h>";
     case FileTypeImplementation:
         return [self symbolsHeaderImportWithPrefix:prefix];
     }

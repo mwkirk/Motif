@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Eric Horacek. All rights reserved.
 //
 
-@import UIKit;
+#import <UIKit/UIKit.h>
 
 #import <Motif/MTFDynamicThemeApplier.h>
 

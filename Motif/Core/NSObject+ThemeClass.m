@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Eric Horacek. All rights reserved.
 //
 
-@import ObjectiveC;
+#import <objc/runtime.h>
 
 #import "NSObject+ThemeClass.h"
 
