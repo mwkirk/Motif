@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Eric Horacek. All rights reserved.
 //
 
-@import Motif;
+#import <Motif/Motif.h>
 
 #import "UIColor+LightnessType.h"
 #import "UILabel+Theming.h"

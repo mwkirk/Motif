@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Eric Horacek. All rights reserved.
 //
 
-@import Motif;
+#import <Motif/Motif.h>
 
 #import "ButtonsViewController.h"
 #import "ThemeSymbols.h"

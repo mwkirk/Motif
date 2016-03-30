@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 Eric Horacek. All rights reserved.
 //
 
-@import UIKit;
-@import Motif;
+#import <UIKit/UIKit.h>
+#import <Motif/Motif.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Eric Horacek. All rights reserved.
 //
 
-@import Motif;
+#import <Motif/Motif.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

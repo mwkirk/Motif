@@ -6,7 +6,7 @@
 //  Copyright © 2016 Eric Horacek. All rights reserved.
 //
 
-@import Motif;
+#import <Motif/Motif.h>
 
 #import "ThemeSymbols.h"
 
