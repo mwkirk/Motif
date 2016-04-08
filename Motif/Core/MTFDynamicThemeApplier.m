@@ -11,8 +11,13 @@
 #import "MTFTheme.h"
 #import "MTFThemeClass.h"
 #import "NSObject+ThemeClass.h"
+#import <objc/runtime.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+NSString* const MTFThemeKey = @"MTFTheme";
+NSString* const MTFThemeAppliedToAppearanceProxyKey = @"MTFThemeAppliedToAppearanceProxy";
+NSString* const MTFThemeApplierDidApplyThemeNotification = @"MTFThemeApplierDidApplyThemeNotification";
 
 @implementation MTFDynamicThemeApplier
 
@@ -54,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSParameterAssert(applicants != nil);
 
     BOOL themeSuccess = YES;
+    BOOL themeAppliedToAppearanceProxy = NO;
 
     for (NSObject *applicant in applicants) {
         BOOL classSuccess = [self
@@ -64,8 +70,22 @@ NS_ASSUME_NONNULL_BEGIN
         if (!classSuccess) {
             themeSuccess = NO;
         }
+        
+        if (themeSuccess && !themeAppliedToAppearanceProxy) {
+            themeAppliedToAppearanceProxy = class_isMetaClass(object_getClass(applicant)) &&
+            ([applicant conformsToProtocol:@protocol(UIAppearance)] ||
+             [applicant conformsToProtocol:@protocol(UIAppearanceContainer)]);
+        }
     }
 
+    // Post a notfication if a theme was applied. Note key for UIAppearance proxy update.
+    if (themeSuccess) {
+        NSDictionary *userInfo = @{ MTFThemeKey : self.theme,
+                                    MTFThemeAppliedToAppearanceProxyKey : @(themeAppliedToAppearanceProxy) };
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        [nc postNotificationName:MTFThemeApplierDidApplyThemeNotification object:self userInfo:userInfo];
+    }
+    
     return themeSuccess;
 }
 
