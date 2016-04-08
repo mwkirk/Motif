@@ -12,6 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const MTFThemeKey;
+extern NSString* const MTFThemeAppliedToAppearanceProxyKey;
+extern NSString* const MTFThemeApplierDidApplyThemeNotification;
+
 /**
  A dynamic theme applier enables dynamic theming, allowing the objects that are
  themed to have a new theme reapplied to them by simply changing the theme
