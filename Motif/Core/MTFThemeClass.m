@@ -68,11 +68,30 @@ NS_ASSUME_NONNULL_BEGIN
     // object.
     NSMutableSet<NSString *> *propertiesWithErrors = [NSMutableSet set];
 
+    // Determine whether we're dealing with an object instance or an ObjC Class.
+    // If it's a Class, we'll use its UIAppearance proxy as the instance.
+    BOOL isClass = class_isMetaClass(object_getClass(applicant));
+    Class applicantClass;
+    id applicantInstance;
+    
+    if (isClass) {
+        // @TODO: Does passing in an id<UIAppearanceContainer> (e.g. UIViewController) that doesn't
+        //        conform to UIAppearance break things?
+        applicantClass = applicant;
+        applicantInstance = [applicant appearance];
+        BOOL hasProtocol = [applicantClass conformsToProtocol:@protocol(UIAppearance)] || [applicantClass conformsToProtocol:@protocol(UIAppearanceContainer)];
+        NSAssert(hasProtocol == YES, @"Class %@ does not conform to the UIAppearance or UIAppearanceContainer protocol", applicantClass);
+    }
+    else {
+        applicantClass = [applicant class];
+        applicantInstance = applicant;
+    }
+    
     // First, attempt to apply each of the class appliers registered on the
     // applicant's class.
-    for (id<MTFThemeClassApplicable> classApplier in [[applicant class] mtf_themeClassAppliers]) {
+    for (id<MTFThemeClassApplicable> classApplier in [applicantClass mtf_themeClassAppliers]) {
         NSError *applierError;
-        NSSet<NSString *> *appliedProperties = [classApplier applyClass:self to:applicant error:&applierError];
+        NSSet<NSString *> *appliedProperties = [classApplier applyClass:self to:applicantInstance error:&applierError];
         
         if (appliedProperties != nil) {
             [unappliedProperties minusSet:appliedProperties];
@@ -94,12 +113,12 @@ NS_ASSUME_NONNULL_BEGIN
     for (NSString *property in [unappliedProperties copy]) {
         // Traverse the class hierarchy from the applicant's class up by
         // superclasses.
-        Class applicantClass = [applicant class];
+        Class traversedApplicantClass = [applicant class];
         do {
             // Locate the first property of the same name as the theme class
             // property in the applicant's class hierarchy.
             objc_property_t objc_property = class_getProperty(
-                applicantClass,
+                traversedApplicantClass,
                 property.UTF8String);
             
             if (objc_property == NULL) continue;
@@ -121,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
                 // out of the loop.
                 if ([constant.value isKindOfClass:propertyClass]) {
                     [unappliedProperties removeObject:property];
-                    [applicant setValue:constant.value forKey:property];
+                    [self setValue:constant.value forPropertyName:property applicantClass:traversedApplicantClass applicantInstance:applicantInstance applicantIsClass:isClass];
                     break;
                 }
             }
@@ -137,7 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
                 // set it with KVC as no transformation is needed.
                 if (isPropertyNumericCType && [constant.value isKindOfClass:NSNumber.class]) {
                     [unappliedProperties removeObject:property];
-                    [applicant setValue:constant.value forKey:property];
+                    [self setValue:constant.value forPropertyName:property applicantClass:traversedApplicantClass applicantInstance:applicantInstance applicantIsClass:isClass];
                     break;
                 }
             }
@@ -172,7 +191,7 @@ NS_ASSUME_NONNULL_BEGIN
                 id transformedValue = [constant transformedValueFromTransformer:valueTransformer error:&valueTransformationError];
 
                 if (transformedValue != nil) {
-                    [applicant setValue:transformedValue forKey:property];
+                    [self setValue:transformedValue forPropertyName:property applicantClass:traversedApplicantClass applicantInstance:applicantInstance applicantIsClass:isClass];
                     break;
                 }
 
@@ -185,10 +204,11 @@ NS_ASSUME_NONNULL_BEGIN
                 break;
             }
             
-            id propertyValue = [applicant valueForKey:property];
             BOOL isPropertyTypeThemeClass = (propertyClass == MTFThemeClass.class);
             BOOL isValueThemeClass = [constant.value isKindOfClass:MTFThemeClass.class];
-
+            // If the applicantInstance is a UIAppearance proxy, we can't use valueForKey
+            id propertyValue = (isValueThemeClass) ? [applicantInstance valueForKey:property] : nil;
+            
             // If the property currently set to a value and the property being
             // applied is a theme class reference, apply the theme class
             // directly to the property value, unless the property type is a
@@ -210,7 +230,7 @@ NS_ASSUME_NONNULL_BEGIN
                 break;
             }
             
-        } while ((applicantClass = [applicantClass superclass]));
+        } while ((traversedApplicantClass = [traversedApplicantClass superclass]));
     }
 
     BOOL logFailures = getenv("MTF_LOG_THEME_APPLICATION_ERRORS") != NULL;
@@ -233,14 +253,14 @@ NS_ASSUME_NONNULL_BEGIN
                 "an applier block registered for the unapplied properties.",
             [unappliedProperties.allObjects componentsJoinedByString:@", "],
             self.name,
-            [applicant class],
-            [applicant class]];
+            applicantClass,
+            applicantClass];
 
         NSError *failedToApplyThemeError = [NSError errorWithDomain:MTFErrorDomain code:MTFErrorFailedToApplyTheme userInfo:@{
             NSLocalizedDescriptionKey: description,
             MTFUnappliedPropertiesErrorKey: unappliedValuesByProperties,
             MTFThemeClassNameErrorKey: self.name,
-            MTFApplicantErrorKey: applicant,
+            MTFApplicantErrorKey: applicantInstance,
         }];
 
         if (error != NULL) {
@@ -269,14 +289,14 @@ NS_ASSUME_NONNULL_BEGIN
                 "named '%@' to an instance of %@.",
             [propertiesWithErrors.allObjects componentsJoinedByString:@", "],
             self.name,
-            [applicant class]];
+            applicantClass];
 
         NSError *failedToApplyThemeError = [NSError errorWithDomain:MTFErrorDomain code:MTFErrorFailedToApplyTheme userInfo:@{
             NSLocalizedDescriptionKey: description,
             MTFUnappliedPropertiesErrorKey: valuesByPropertiesWithErrors,
             MTFThemeClassNameErrorKey: self.name,
             MTFUnderlyingErrorsErrorKey: errors,
-            MTFApplicantErrorKey: applicant,
+            MTFApplicantErrorKey: applicantInstance,
         }];
 
         if (error != NULL) {
@@ -290,7 +310,12 @@ NS_ASSUME_NONNULL_BEGIN
         return NO;
     }
 
-    [applicant mtf_setThemeClass:self];
+    if (isClass) {
+        [applicantClass mtf_setThemeClass:self];
+    }
+    else {
+        [applicantInstance mtf_setThemeClass:self];
+    }
     
     return YES;
 }
@@ -356,6 +381,68 @@ NS_ASSUME_NONNULL_BEGIN
 
     return [properties copy];
 }
+
+- (SEL)setterSelectorForPropertyName:(NSString*)propertyName
+{
+    NSString *capitalizedPropertyName = [propertyName stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[propertyName substringToIndex:1] capitalizedString]];
+    NSString *methodString = [NSString stringWithFormat:@"set%@:", capitalizedPropertyName];
+    SEL propertySetterSelector = NSSelectorFromString(methodString);
+    return propertySetterSelector;
+}
+
+- (void)setValue:(id)aValue forPropertyName:(NSString*)aPropertyName applicantClass:(Class)aClass
+applicantInstance:(id)aInstance applicantIsClass:(BOOL)aIsClass
+{
+    // When theming normal object instances, simply use KVC
+    if (!aIsClass) {
+        [aInstance setValue:aValue forKey:aPropertyName];
+        return;
+    }
+    
+    // But, if we're setting the appearance of a class via its UIAppearance proxy, we can't use KVC
+    SEL setterSelector = [self setterSelectorForPropertyName:aPropertyName];
+    
+    if ([aClass instancesRespondToSelector:setterSelector]) {
+        // Args start at Index 2
+        NSMethodSignature *sig = [aClass instanceMethodSignatureForSelector:setterSelector];
+
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
+        invocation.selector = setterSelector;
+        invocation.target = aInstance;
+        const char *typeOfProperty = [sig getArgumentTypeAtIndex:2];
+        
+        if (strcmp(typeOfProperty, @encode(id)) == 0) {
+            [invocation setArgument:&aValue atIndex:2];
+        }
+        else if (strcmp(typeOfProperty, @encode(BOOL)) == 0) {
+            BOOL buf[] = { [aValue boolValue] };
+            [invocation setArgument:buf atIndex:2];
+        }
+        else if (strcmp(typeOfProperty, @encode(int)) == 0) {
+            int buf[] = { [aValue intValue] };
+            [invocation setArgument:buf atIndex:2];
+        }
+        else if (strcmp(typeOfProperty, @encode(float)) == 0) {
+            float buf[] = { [aValue floatValue] };
+            [invocation setArgument:buf atIndex:2];
+        }
+        else if (strcmp(typeOfProperty, @encode(double)) == 0) {
+            double buf[] = { [aValue doubleValue] };
+            [invocation setArgument:buf atIndex:2];
+        }
+        else if (strcmp(typeOfProperty, @encode(typeof(UIEdgeInsets))) == 0) {
+            UIEdgeInsets buf[] = { [aValue UIEdgeInsetsValue] };
+            [invocation setArgument:buf atIndex:2];
+        }
+        else { // @TODO: Any other struct types needed?
+            [NSException raise:NSGenericException format:@"Unsupported property type for UIAppearance: %s", typeOfProperty];
+        }
+        
+        [invocation invoke];
+    }
+}
+
+
 
 #pragma mark - NSObject
 
