@@ -10,6 +10,7 @@
 
 #import "MTFThemeClassPropertyApplier.h"
 #import "MTFThemeClassPropertiesApplier.h"
+#import "MTFThemeClassPropertyUIAppearanceApplier.h"
 #import "MTFThemeClassApplicable.h"
 #import "MTFErrors.h"
 
@@ -43,6 +44,23 @@ NS_ASSUME_NONNULL_BEGIN
         valueClass:valueClass
         applierBlock:applierBlock];
         
+    [self mtf_registerThemeClassApplier:applier];
+    return applier;
+}
+
++ (id<MTFThemeClassApplicable>)mtf_registerThemeProperty:(NSString *)property
+                                   requiringValueOfClass:(Class)valueClass
+                             forUIAppearanceApplierBlock:(MTFThemePropertyUIAppearanceApplierBlock)applierBlock
+{
+    NSParameterAssert(property != nil);
+    NSParameterAssert(valueClass != nil);
+    NSParameterAssert(applierBlock != nil);
+
+    MTFThemeClassPropertyUIAppearanceApplier *applier = [[MTFThemeClassPropertyUIAppearanceApplier alloc]
+            initWithProperty:property
+                  valueClass:valueClass
+                applierBlock:applierBlock];
+
     [self mtf_registerThemeClassApplier:applier];
     return applier;
 }

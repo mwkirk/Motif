@@ -24,6 +24,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef BOOL (^MTFThemePropertyApplierBlock)(id propertyValue, id objectToTheme, NSError  **error);
 
+/**
+ A block that is invoked to apply the property value to a class via its UIAppearance proxy
+ that this applier is registered with. The registered class may also be used as a
+ UIAppearanceContainer.
+ 
+ @param propertyValue The property value that should be applied to the specified class's
+                      UIAppearance proxy.
+ */
+typedef BOOL (^MTFThemePropertyUIAppearanceApplierBlock)(id propertyValue, NSError **error);
+
 /// A block that is invoked to apply a property value to an instance of the
 /// class that this applier is registered with.
 ///
@@ -80,6 +90,12 @@ typedef BOOL (^MTFThemePropertiesApplierBlock)(NSDictionary<NSString *, id> *val
  @return An opaque theme class applier. You may discard this reference.
  */
 + (id<MTFThemeClassApplicable>)mtf_registerThemeProperty:(NSString *)property requiringValueOfClass:(Class)valueClass applierBlock:(MTFThemePropertyApplierBlock)applierBlock;
+
+
++ (id<MTFThemeClassApplicable>)mtf_registerThemeProperty:(NSString *)property
+                                   requiringValueOfClass:(Class)valueClass
+                             forUIAppearanceApplierBlock:(MTFThemePropertyUIAppearanceApplierBlock)applierBlock;
+
 
 /// Registers a block that is invoked to apply a property value to an instance
 /// of the receiving class.
