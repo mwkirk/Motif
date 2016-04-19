@@ -24,13 +24,19 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param applier The applier that should be deregistered.
 + (void)mtf_deregisterThemeClassApplier:(id<MTFThemeClassApplicable>)applier;
 
++ (void)mtf_deregisterThemeClassUIAppearanceApplier:(id<MTFThemeClassApplicable>)applier;
+
 /// The theme class appliers registered for this class resolved across the
 /// entire class hierarchy.
 + (NSArray<id<MTFThemeClassApplicable>> *)mtf_themeClassAppliers;
 
++ (NSArray<id<MTFThemeClassApplicable>> *)mtf_themeClassUIAppearanceAppliers;
+
 /// The theme appliers registered for just this class, not including
 /// superclasses.
 + (NSMutableArray<id<MTFThemeClassApplicable>> *)mtf_classThemeClassAppliers;
+
++ (NSMutableArray<id<MTFThemeClassApplicable>> *)mtf_classThemeClassUIAppearanceAppliers;
 
 @end
 

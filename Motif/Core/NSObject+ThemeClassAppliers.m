@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
                   valueClass:valueClass
                 applierBlock:applierBlock];
 
-    [self mtf_registerThemeClassApplier:applier];
+    [self mtf_registerThemeClassUIAppearanceApplier:applier];
     return applier;
 }
 
@@ -145,6 +145,18 @@ NS_ASSUME_NONNULL_BEGIN
     [self.mtf_classThemeClassAppliers addObject:applier];
 }
 
++ (void)mtf_registerThemeClassUIAppearanceApplier:(id<MTFThemeClassApplicable>)applier {
+    NSParameterAssert(applier != nil);
+    
+    NSAssert(
+             NSThread.isMainThread,
+             @"Theme class applier registration should only be invoked from the "
+             "main thread in +[NSObject load] or +[NSObject initialize] "
+             "methods.");
+    
+    [self.mtf_classThemeClassUIAppearanceAppliers addObject:applier];
+}
+
 + (BOOL)mtf_populateApplierError:(NSError **)error withDescription:(NSString *)description {
     NSParameterAssert(description != nil);
 
@@ -187,11 +199,32 @@ NS_ASSUME_NONNULL_BEGIN
     [self.mtf_classThemeClassAppliers removeObject:applier];
 }
 
++ (void)mtf_deregisterThemeClassUIAppearanceApplier:(id<MTFThemeClassApplicable>)applier {
+    NSParameterAssert(applier != nil);
+    
+    NSAssert(
+             NSThread.isMainThread,
+             @"Theme class applier deregistration should only be invoked from the "
+             "main thread.");
+    
+    [self.mtf_classThemeClassUIAppearanceAppliers removeObject:applier];
+}
+
 + (NSArray<id<MTFThemeClassApplicable>> *)mtf_themeClassAppliers {
     NSMutableArray<id<MTFThemeClassApplicable>> *appliers = [NSMutableArray array];
     Class class = self.class;
     do {
         NSMutableArray<id<MTFThemeClassApplicable>> *classAppliers = class.mtf_classThemeClassAppliers;
+        [appliers addObjectsFromArray:classAppliers];
+    } while ((class = class.superclass));
+    return appliers;
+}
+
++ (NSArray<id<MTFThemeClassApplicable>> *)mtf_themeClassUIAppearanceAppliers {
+    NSMutableArray<id<MTFThemeClassApplicable>> *appliers = [NSMutableArray array];
+    Class class = self.class;
+    do {
+        NSMutableArray<id<MTFThemeClassApplicable>> *classAppliers = class.mtf_classThemeClassUIAppearanceAppliers;
         [appliers addObjectsFromArray:classAppliers];
     } while ((class = class.superclass));
     return appliers;
@@ -209,6 +242,20 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return appliers;
 }
+
++ (NSMutableArray<id<MTFThemeClassApplicable>> *)mtf_classThemeClassUIAppearanceAppliers {
+    NSMutableArray<id<MTFThemeClassApplicable>> *appliers = objc_getAssociatedObject(self, _cmd);
+    if (appliers == nil) {
+        appliers = [NSMutableArray array];
+        objc_setAssociatedObject(
+                                 self,
+                                 _cmd,
+                                 appliers,
+                                 OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return appliers;
+}
+
 
 @end
 
