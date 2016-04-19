@@ -74,33 +74,51 @@ NS_ASSUME_NONNULL_BEGIN
     Class applicantClass;
     id applicantInstance;
     
-    if (isClass) {
+    if (isClass) { // UIAppearance
         // @TODO: Does passing in an id<UIAppearanceContainer> (e.g. UIViewController) that doesn't
         //        conform to UIAppearance break things?
         applicantClass = applicant;
         applicantInstance = [applicant appearance];
         BOOL hasProtocol = [applicantClass conformsToProtocol:@protocol(UIAppearance)] || [applicantClass conformsToProtocol:@protocol(UIAppearanceContainer)];
         NSAssert(hasProtocol == YES, @"Class %@ does not conform to the UIAppearance or UIAppearanceContainer protocol", applicantClass);
+        
+        // First, attempt to apply each of the class appliers registered on the
+        // applicant's class.
+        for (id<MTFThemeClassApplicable> classApplier in [applicantClass mtf_themeClassUIAppearanceAppliers]) {
+            NSError *applierError;
+            NSSet<NSString *> *appliedProperties = [classApplier applyClass:self to:applicantInstance error:&applierError];
+            
+            if (appliedProperties != nil) {
+                [unappliedProperties minusSet:appliedProperties];
+            } else {
+                [unappliedProperties minusSet:classApplier.properties];
+                [propertiesWithErrors unionSet:classApplier.properties];
+                
+                if (applierError != nil) {
+                    [errors addObject:applierError];
+                }
+            }
+        }
     }
     else {
         applicantClass = [applicant class];
         applicantInstance = applicant;
-    }
-    
-    // First, attempt to apply each of the class appliers registered on the
-    // applicant's class.
-    for (id<MTFThemeClassApplicable> classApplier in [applicantClass mtf_themeClassAppliers]) {
-        NSError *applierError;
-        NSSet<NSString *> *appliedProperties = [classApplier applyClass:self to:applicantInstance error:&applierError];
         
-        if (appliedProperties != nil) {
-            [unappliedProperties minusSet:appliedProperties];
-        } else {
-            [unappliedProperties minusSet:classApplier.properties];
-            [propertiesWithErrors unionSet:classApplier.properties];
-
-            if (applierError != nil) {
-                [errors addObject:applierError];
+        // First, attempt to apply each of the class appliers registered on the
+        // applicant's class.
+        for (id<MTFThemeClassApplicable> classApplier in [applicantClass mtf_themeClassAppliers]) {
+            NSError *applierError;
+            NSSet<NSString *> *appliedProperties = [classApplier applyClass:self to:applicantInstance error:&applierError];
+            
+            if (appliedProperties != nil) {
+                [unappliedProperties minusSet:appliedProperties];
+            } else {
+                [unappliedProperties minusSet:classApplier.properties];
+                [propertiesWithErrors unionSet:classApplier.properties];
+                
+                if (applierError != nil) {
+                    [errors addObject:applierError];
+                }
             }
         }
     }
